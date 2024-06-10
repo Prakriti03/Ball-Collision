@@ -117,8 +117,8 @@ class Ball {
       // Resolve overlap
       const overlap_distance =
         this.diameter / 2 + otherBall.diameter / 2 - ball_distance;
-      const overlapX = overlap_distance * Math.cos(angle_of_collision);
-      const overlapY = overlap_distance * Math.sin(angle_of_collision);
+      const overlapX = overlap_distance * cos;
+      const overlapY = overlap_distance * sin;
 
       this.posX += overlapX * (m2 / (m1 + m2));
       this.posY += overlapY * (m2 / (m1 + m2));
@@ -136,12 +136,12 @@ function Color() {
 //update the properties of balls
 function updateBall() {
   const color = Color();
-  const diameter = getRandomInt(10, 40);
+  const diameter = getRandomInt(15,40);
 
   const x = getRandomInt(0, container.clientWidth - diameter);
   const y = getRandomInt(0, container.clientHeight - diameter);
 
-  const speed = getRandomInt(2, 4);
+  const speed = getRandomInt(2, 3);
 
   const array_all = [x,y,diameter,speed,color]
 
@@ -151,7 +151,7 @@ function updateBall() {
 // Creating the ball array
 const balls = [];
 
-const ball_count = 100;
+const ball_count = 500;
 for (let i = 0; i < ball_count; i++) {
   array_all = updateBall();
   const ball = new Ball(array_all[0],array_all[1],array_all[2],array_all[3],array_all[4]);
