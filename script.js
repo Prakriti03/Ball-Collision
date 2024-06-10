@@ -86,8 +86,8 @@ class Ball {
   }
   //Check collision with other balls
   ball_collision(otherBall) {
-    const dx = this.posX - otherBall.posX;
-    const dy = this.posY - otherBall.posY;
+    const dx = this.posX+this.diameter/2 - otherBall.posX-otherBall.diameter/2;
+    const dy = this.posY+this.diameter/2 - otherBall.posY-otherBall.diameter/2;
     const ball_distance = Math.sqrt(dx * dx + dy * dy);
 
     if (this.diameter / 2 + otherBall.diameter / 2 >= ball_distance) {
@@ -136,7 +136,7 @@ function Color() {
 //update the properties of balls
 function updateBall() {
   const color = Color();
-  const diameter = getRandomInt(20, 40);
+  const diameter = getRandomInt(10, 40);
 
   const x = getRandomInt(0, container.clientWidth - diameter);
   const y = getRandomInt(0, container.clientHeight - diameter);
@@ -151,7 +151,7 @@ function updateBall() {
 // Creating the ball array
 const balls = [];
 
-const ball_count = 500;
+const ball_count = 100;
 for (let i = 0; i < ball_count; i++) {
   array_all = updateBall();
   const ball = new Ball(array_all[0],array_all[1],array_all[2],array_all[3],array_all[4]);
