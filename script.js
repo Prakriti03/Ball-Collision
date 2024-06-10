@@ -56,15 +56,16 @@ class Ball {
     this.element.style.background = this.color;
     this.element.style.borderRadius = "50%";
   }
-
+  //Check collision with rectangular boundary
   boundary_collision() {
     this.posX += this.velX;
     this.posY += this.velY;
-
+    //left side collision
     if (this.posX <= 0) {
       this.posX = 0;
       this.velX = -this.velX;
     }
+    //top collision
     if (this.posY <= 0) {
       this.posY = 0;
       this.velY = -this.velY;
@@ -75,16 +76,15 @@ class Ball {
       this.posX = CONTAINER_WIDTH - this.diameter;
       this.velX = -this.velX;
     }
-
+    //bottom collision
     if (this.posY + this.diameter >= CONTAINER_HEIGHT) {
       this.posY = CONTAINER_HEIGHT - this.diameter;
       this.velY = -this.velY;
     }
-
     this.element.style.left = `${this.posX}px`;
     this.element.style.top = `${this.posY}px`;
   }
-
+  //Check collision with other balls
   ball_collision(otherBall) {
     const dx = this.posX - otherBall.posX;
     const dy = this.posY - otherBall.posY;
@@ -127,11 +127,13 @@ class Ball {
     }
   }
 }
+//generate random color
 function Color() {
   color = ["red", "green", "black", "purple", "violet", "pink", "blue"];
   getColor = color[Math.floor(Math.random() * 6)];
   return getColor;
 }
+//update the properties of balls
 function updateBall() {
   const color = Color();
   const diameter = getRandomInt(20, 40);
@@ -148,7 +150,8 @@ function updateBall() {
 
 // Creating the ball array
 const balls = [];
-const ball_count = 100;
+
+const ball_count = 500;
 for (let i = 0; i < ball_count; i++) {
   array_all = updateBall();
   const ball = new Ball(array_all[0],array_all[1],array_all[2],array_all[3],array_all[4]);
@@ -159,7 +162,7 @@ for (let i = 0; i < ball_count; i++) {
 function animateBalls() {
   balls.forEach((ball) => {
     ball.boundary_collision();
-    
+    //compare each ball with other ball
     balls.forEach((otherBall) => {
       if (ball !== otherBall) {
         ball.ball_collision(otherBall);
