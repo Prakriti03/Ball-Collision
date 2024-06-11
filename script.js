@@ -57,9 +57,10 @@ class Ball {
     this.element.style.borderRadius = "50%";
   }
   //Check collision with rectangular boundary
-  boundary_collision() {
+  boundaryCollision() {
     this.posX += this.velX;
     this.posY += this.velY;
+
     //left side collision
     if (this.posX <= 0) {
       this.posX = 0;
@@ -70,7 +71,6 @@ class Ball {
       this.posY = 0;
       this.velY = -this.velY;
     }
-
     //right side collision
     if (this.posX + this.diameter >= CONTAINER_WIDTH) {
       this.posX = CONTAINER_WIDTH - this.diameter;
@@ -81,61 +81,68 @@ class Ball {
       this.posY = CONTAINER_HEIGHT - this.diameter;
       this.velY = -this.velY;
     }
+
     this.element.style.left = `${this.posX}px`;
     this.element.style.top = `${this.posY}px`;
   }
+
   //Check collision with other balls
-  ball_collision(otherBall) {
-    const dx = this.posX+this.diameter/2 - otherBall.posX-otherBall.diameter/2;
-    const dy = this.posY+this.diameter/2 - otherBall.posY-otherBall.diameter/2;
-    const ball_distance = Math.sqrt(dx * dx + dy * dy);
+  ballCollision(otherBall) {
+    if(this!==otherBall){
+      const dx = this.posX+this.diameter/2 - otherBall.posX-otherBall.diameter/2;
+      const dy = this.posY+this.diameter/2 - otherBall.posY-otherBall.diameter/2;
+      const ballDistance = Math.sqrt(dx * dx + dy * dy);
+  
+      if (this.diameter / 2 + otherBall.diameter / 2 >= ballDistance) {
+        const angle_of_collision = Math.atan2(dy, dx);
+        const sin = Math.sin(angle_of_collision);
+        const cos = Math.cos(angle_of_collision);
+  
+        // Rotate velocities
+        const velX1 = cos * this.velX + sin * this.velY;
+        const velY1 = cos * this.velY - sin * this.velX;
+        const velX2 = cos * otherBall.velX + sin * otherBall.velY;
+        const velY2 = cos * otherBall.velY - sin * otherBall.velX;
+  
+        // Update velocities based on mass
+        const m1 = this.diameter;
+        const m2 = otherBall.diameter;
+  
+        const newVelX1 = (velX1 * (m1 - m2) + 2 * m2 * velX2) / (m1 + m2);
+        const newVelX2 = (velX2 * (m2 - m1) + 2 * m1 * velX1) / (m1 + m2);
+  
+        // Rotate velocities back
+        this.velX = cos * newVelX1 - sin * velY1;
+        this.velY = cos * velY1 + sin * newVelX1;
+        otherBall.velX = cos * newVelX2 - sin * velY2;
+        otherBall.velY = cos * velY2 + sin * newVelX2;
+  
+        // Resolve overlap
+        const overlap_distance =
+          this.diameter / 2 + otherBall.diameter / 2 - ballDistance;
+        const overlapX = overlap_distance * cos;
+        const overlapY = overlap_distance * sin;
+  
+        this.posX += overlapX * (m2 / (m1 + m2));
+        this.posY += overlapY * (m2 / (m1 + m2));
+        otherBall.posX -= overlapX * (m1 / (m1 + m2));
+        otherBall.posY -= overlapY * (m1 / (m1 + m2));
+      }
 
-    if (this.diameter / 2 + otherBall.diameter / 2 >= ball_distance) {
-      const angle_of_collision = Math.atan2(dy, dx);
-      const sin = Math.sin(angle_of_collision);
-      const cos = Math.cos(angle_of_collision);
-
-      // Rotate velocities
-      const velX1 = cos * this.velX + sin * this.velY;
-      const velY1 = cos * this.velY - sin * this.velX;
-      const velX2 = cos * otherBall.velX + sin * otherBall.velY;
-      const velY2 = cos * otherBall.velY - sin * otherBall.velX;
-
-      // Update velocities based on mass
-      const m1 = this.diameter;
-      const m2 = otherBall.diameter;
-
-      const newVelX1 = (velX1 * (m1 - m2) + 2 * m2 * velX2) / (m1 + m2);
-      const newVelX2 = (velX2 * (m2 - m1) + 2 * m1 * velX1) / (m1 + m2);
-
-      // Rotate velocities back
-      this.velX = cos * newVelX1 - sin * velY1;
-      this.velY = cos * velY1 + sin * newVelX1;
-      otherBall.velX = cos * newVelX2 - sin * velY2;
-      otherBall.velY = cos * velY2 + sin * newVelX2;
-
-      // Resolve overlap
-      const overlap_distance =
-        this.diameter / 2 + otherBall.diameter / 2 - ball_distance;
-      const overlapX = overlap_distance * cos;
-      const overlapY = overlap_distance * sin;
-
-      this.posX += overlapX * (m2 / (m1 + m2));
-      this.posY += overlapY * (m2 / (m1 + m2));
-      otherBall.posX -= overlapX * (m1 / (m1 + m2));
-      otherBall.posY -= overlapY * (m1 / (m1 + m2));
     }
   }
 }
+
 //generate random color
-function Color() {
-  color = ["red", "green", "black", "purple", "violet", "pink", "blue"];
-  getColor = color[Math.floor(Math.random() * 6)];
+function getRandomColor() {
+  COLORS = ["red", "green", "black", "purple", "violet", "pink", "blue"];
+  getColor = COLORS[Math.floor(Math.random() * 6)];
   return getColor;
 }
+
 //update the properties of balls
 function updateBall() {
-  const color = Color();
+  const color = getRandomColor();
   const diameter = getRandomInt(15,40);
 
   const x = getRandomInt(0, container.clientWidth - diameter);
@@ -151,7 +158,7 @@ function updateBall() {
 // Creating the ball array
 const balls = [];
 
-const ball_count = 500;
+const ball_count = 100;
 for (let i = 0; i < ball_count; i++) {
   array_all = updateBall();
   const ball = new Ball(array_all[0],array_all[1],array_all[2],array_all[3],array_all[4]);
@@ -161,12 +168,10 @@ for (let i = 0; i < ball_count; i++) {
 
 function animateBalls() {
   balls.forEach((ball) => {
-    ball.boundary_collision();
+    ball.boundaryCollision();
     //compare each ball with other ball
     balls.forEach((otherBall) => {
-      if (ball !== otherBall) {
-        ball.ball_collision(otherBall);
-      }
+      ball.ballCollision(otherBall)
     });
 
   });
